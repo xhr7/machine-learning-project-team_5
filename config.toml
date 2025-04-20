@@ -1,0 +1,8 @@
+# .streamlit/config.toml
+[theme]
+base = "dark"                        # dark mode
+primaryColor = "#39ff14"             # neon green for buttons, links, etc.
+backgroundColor = "#000000"          # pitch‐black background
+secondaryBackgroundColor = "#001100" # very dark panel backgrounds
+textColor = "#39ff14"                # all text in green
+font = "monospace"                   # hacker‑style monospace
