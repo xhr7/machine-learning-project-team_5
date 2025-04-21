@@ -1,11 +1,8 @@
 # app.py
 
-import os
-import json
 import streamlit as st
-import numpy as np
-import pandas as pd
-import tensorflow as tf
+import json
+import requests
 
 # ─── 1️⃣ Page config ─────────────────────────────────
 st.set_page_config(
@@ -92,60 +89,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─── 3️⃣ Load feature names, model, threshold ─────────────
-FEATURE_PATH = "models/feature_names.json"
-MODEL_PATH   = "models/autoencoder.h5"
-TH_PATH      = "models/threshold.json"
-
-# Load feature list
-if not os.path.exists(FEATURE_PATH):
-    st.error(f"Missing {FEATURE_PATH}. Run your notebook to save feature_names.json.")
-    st.stop()
-FEATURE_COLUMNS = json.load(open(FEATURE_PATH))
-
-@st.cache_resource
-def load_model_and_threshold():
-    # Ensure all required files exist
-    missing = [p for p in (MODEL_PATH, TH_PATH) if not os.path.exists(p)]
-    if missing:
-        st.error(
-            "Missing files:\n" +
-            "\n".join(f"- {m}" for m in missing) +
-            "\n\nMake sure your notebook saved autoencoder.h5 and threshold.json."
-        )
-        st.stop()
-
-    # Skip compiling (we only need inference)
-    ae = tf.keras.models.load_model(MODEL_PATH, compile=False)
-    threshold = json.load(open(TH_PATH))["threshold"]
-    return ae, threshold
-
-autoencoder, THRESHOLD = load_model_and_threshold()
-
-# ─── 4️⃣ Inference helper ─────────────────────────────────
-def classify(data: dict):
-    df = pd.json_normalize(data)
-    # Reindex to exactly the columns we trained on, filling missing with 0
-    df = df.reindex(columns=FEATURE_COLUMNS, fill_value=0)
-    row = df.to_numpy().astype(np.float32)  # shape (1, 62)
-
-    recon = autoencoder.predict(row, verbose=0)
-    mse   = float(np.mean((row - recon) ** 2, axis=1)[0])
-    label = "ANOMALY" if mse > THRESHOLD else "BENIGN"
-    return label, mse
-
-# ─── 5️⃣ Page navigation ─────────────────────────────────
+# ─── 3️⃣ Page navigation ─────────────────────────────────
 page = st.sidebar.radio("📂 Navigate", ["Home", "Team"])
 
-# ─── 6️⃣ Home: anomaly test UI ───────────────────────────
+# ─── 4️⃣ Home: call the FastAPI for inference ───────────
 if page == "Home":
     st.markdown('<div class="console">', unsafe_allow_html=True)
-    st.markdown('<div class="neon-title">> Anomaly Detector Test</div>', unsafe_allow_html=True)
+    st.markdown('<div class="neon-title">> Cyber Anomaly Test</div>', unsafe_allow_html=True)
 
     st.write("""
     Upload a single **row JSON** matching your dataset schema,  
-    and the autoencoder will reconstruct it. We flag it  
-    as **ANOMALY** if its reconstruction MSE exceeds the threshold.
+    and see **BENIGN** or **ANOMALY** via our FastAPI service.
     """)
 
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -154,23 +108,37 @@ if page == "Home":
     st.markdown("</div>", unsafe_allow_html=True)
 
     if uploaded:
-        data = json.load(uploaded)
-        st.subheader("📄 Input JSON")
-        st.json(data)
+        # load raw JSON
+        raw = json.load(uploaded)
 
+        # if it’s a list, grab the first element
+        if isinstance(raw, list) and raw:
+            payload = raw[0]
+        else:
+            payload = raw
+
+        # call FastAPI
         try:
-            label, mse = classify(data)
-            st.markdown('<div class="neon-box">', unsafe_allow_html=True)
-            st.markdown(f"### 🔍 Label: **{label}**")
-            st.write(f"- Reconstruction MSE: `{mse:.6f}`")
-            st.write(f"- Threshold:          `{THRESHOLD:.6f}`")
-            st.markdown("</div>", unsafe_allow_html=True)
+            res = requests.post(
+                "http://localhost:8000/predict",
+                json=payload,
+                timeout=5
+            )
+            res.raise_for_status()
+            label = res.json().get("label", "ERROR")
         except Exception as e:
-            st.error(f"❗ Error running model: {e}")
+            st.error(f"❗ API error: {e}")
+            label = None
+
+        # display result
+        if label:
+            st.markdown('<div class="neon-box">', unsafe_allow_html=True)
+            st.markdown(f"### 🔍 Label: **{label}**", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ─── 7️⃣ Team page ───────────────────────────────────────
+# ─── 5️⃣ Team page (unchanged) ───────────────────────────
 else:
     st.markdown('<div class="console">', unsafe_allow_html=True)
     st.markdown('<div class="neon-title">> Meet the Team</div>', unsafe_allow_html=True)
