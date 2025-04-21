@@ -108,16 +108,13 @@ if page == "Home":
     st.markdown("</div>", unsafe_allow_html=True)
 
     if uploaded:
-        # load raw JSON
         raw = json.load(uploaded)
 
-        # if it’s a list, grab the first element
         if isinstance(raw, list) and raw:
             payload = raw[0]
         else:
             payload = raw
 
-        # call FastAPI
         try:
             res = requests.post(
                 "http://localhost:8000/predict",
@@ -125,16 +122,37 @@ if page == "Home":
                 timeout=5
             )
             res.raise_for_status()
-            label = res.json().get("label", "ERROR")
+            jr = res.json()
+            label  = jr.get("label", "ERROR")
+            attack = jr.get("attack", None)
         except Exception as e:
             st.error(f"❗ API error: {e}")
-            label = None
+            label, attack = None, None
 
-        # display result
         if label:
-            st.markdown('<div class="neon-box">', unsafe_allow_html=True)
-            st.markdown(f"### 🔍 Label: **{label}**", unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            # BENIGN case
+            if label == "BENIGN":
+                st.markdown('<div class="neon-box">', unsafe_allow_html=True)
+                st.markdown(f"### 🔍 Label: **{label}**", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            # ANOMALY case: show GIF + attack name
+            else:
+                # explosion GIF
+                gif_url = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmpzdnJza3ZrOTU0OTl5cnd1Mmd1Ymg0MXhnNHRqOTM0M3RicXBwMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lp3GUtG2waC88/giphy.gif"
+                st.markdown(
+                    f"""
+                    <div style="display:flex; justify-content:center; margin: 1rem 0;">
+                      <img src="{gif_url}" width="899px">
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                # attack name below
+                st.markdown('<div class="neon-box">', unsafe_allow_html=True)
+                st.markdown(f"### 💥 Attack Type: **{attack}**", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
