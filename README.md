@@ -1,106 +1,73 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Nt1hroEP)
+## Two-Stage Network Intrusion Detection System
 
-# 🚀 Machine Learning Week Project: Predictive Modeling and Deployment
+This project implements a two-stage machine learning pipeline for detecting network intrusions. In the first stage, an ANN-based binary classifier determines whether a given network flow is benign or malicious.
 
-## 📢 Announcement
-Welcome to the Machine Learning Week project! In this project, you’ll apply machine learning to solve a real-world problem using a public dataset. Your goal is to build, evaluate, and deploy an ML model.
+If a flow is flagged as malicious, the second stage uses a multi-class classifier to identify the specific attack type (out of 14 possible categories).
+This two-step approach improves accuracy by filtering out benign traffic first and then performing detailed attack classification on the suspicious traffic. Developed by Team 5 as part of an AI bootcamp, the project covers the entire workflow from data preprocessing and model training to deployment. We provide Jupyter notebooks for data handling and model development, as well as a ready-to-run FastAPI backend and Streamlit frontend for demonstrating the intrusion detection system in action.
 
-## 📝 Deliverables
-- **Python Notebooks**: Data collection, cleaning, modeling, and evaluation.
-- **Deployment**: 
-    - Create a REST API using FastAPI or Flask.
-    - Build a frontend using Streamlit.
-    - Deploy both the Streamlit and the API.
-- **Data**: Raw and cleaned datasets.
-- **Presentation**: A final presentation summarizing your project (details below).
-- **Requirements file**: List of dependencies for the project.
-- **README**: Project overview and instructions.
+# Team Members:
 
-## 📚 Suggested README Template:
-<details>
-<summary>Click to Expand Template</summary>
+Yousef Al‑Dayhan
+Alhanouf Al‑Suwaid
+Ezdhar Al‑Tamimi
+Rahaf Masmali
+Omar AlSuraia
+Data Source
 
-## Team Members
-- [Team Member 1 Name]
-- [Team Member 2 Name]
-- [Team Member 3 Name]
-- [Team Member 4 Name]
-- [Team Member 5 Name]
+We used the CyberBERT Dataset from Hugging Face as our source of network traffic data.
 
+This dataset is derived from the well-known CICIDS2017 benchmark and provides extensive network flow records for training and evaluating the IDS.
 
+# Key features of the dataset include:
 
-## Data Source
-- Description of data source(s).
-- Link to data or scraping details (if applicable).
+A wide range of network traffic features for cybersecurity threat detection (e.g., packet lengths, flow durations, header sizes, etc.).
+Both normal benign traffic and various attack types (e.g., DoS, PortScan, DDoS, Infiltration, Botnet, and more) are represented.
 
-## 🗂️ Project Structure
+Each record corresponds to a single network flow with detailed statistical features, labeled as Benign or as one of 14 malicious attack categories.
+We loaded the dataset directly using the Hugging Face datasets library,
 
-```bash
-    ├── data/
-    │   ├── raw/             # Original data files
-    │   ├── processed/       # Cleaned and transformed data
-    ├── notebooks/
-    │   ├── data_handelling/             # Original data files
-    |   |  ├── 01_data_collection.ipynb  # Data collection (if scraped)
-    │   |  ├── 02_data_cleaning.ipynb    # Data cleaning and preprocessing
-    │   ├── model_training/       # Model training and evaluation
-    ├── deployment/          # Files for deployment (if applicable)
-    ├── slides/              # Presentation slides (e.g., .pptx or .pdf)
-    ├── requirements.txt     # Python dependencies
-    ├── README.md            # Project overview and instructions
-```
+# Project Structure
 
-## 🛠️ Tools & Libraries
-- **Python**: [list here]
-- **Deployment**: [list here].
+For clarity and modularity, our repository is organized as follows:
+├── 01_project.ipynb # Data cleaning and preprocessing and Model training and evaluation notebook
+├── README.md # Project overview and instructions (this file)
 
-## 🚀 Usage
-1. Clone the repository:
-   ```bash
-   git clone [repo_url]
-2. Install depencdencies 
-    ```bash
-    pip install -r requirements.txt
-3. Run notebooks in order
-    ```bash
-     ...
----
-</details>
+# Tools & Libraries
 
+This project leverages a variety of tools and libraries in the Python ecosystem:
+Python – Programming language used for all project components.
+pandas – For data manipulation and analysis (handling data frames of network traffic features).
+numpy – For numerical computations and array operations.
+datasets (Hugging Face) – To easily download and manage the CyberBERT dataset.
+scikit-learn – For data preprocessing (train/test splitting, scaling) and as a baseline for some models/metrics.
+tensorflow – Used to build and train the Artificial Neural Network models for both binary and multi-class classification.
+matplotlib & seaborn – For plotting and visualizing data distributions, training progress, and evaluation results (e.g., confusion matrices).
+FastAPI – To create a RESTful API for serving the trained models (backend deployment).
+Streamlit – To build an interactive web application as a frontend, allowing users to input data and see predictions in real time.
+Make sure to install all these dependencies (listed in requirements.txt) before running the project.
+Usage Instructions
+Follow these steps to set up and run the project on your local machine:
 
-## 📌 Key Tips:
+# Clone the repository from GitHub
 
-<details>
-<summary>Click to Expand Tips</summary>
+$ git clone https://github.com/AI-bootcamp/machine-learning-project-team_5.git
 
-1. **Data Handling**:
-   - Document your data collection and cleaning processes clearly. Explain how raw data is transformed into a usable format.
-   - Handle missing values and outliers carefully; they can impact model performance.
+# Navigate into the project directory
 
-2. **Model Training**:
-   - Choose a model that is well-suited for the task and ensure that you evaluate it thoroughly (cross-validation, performance metrics, etc.).
-   - Experiment with hyperparameter tuning to improve results.
+$ cd machine-learning-project-team_5
 
-3. **Deployment**:
-   - If deploying, ensure the model can serve predictions efficiently. Use frameworks like Streamlit or Flask for a simple interface.
-   - Test the deployment in real scenarios for robustness.
+# Install all required Python dependencies
 
-4. **Presentation**:
-   - Keep your slides concise, focusing on the key problem, approach, and results.
-   - Use visuals like charts, graphs, and model performance metrics to back up your conclusions.
-5. **Emphasize collaboration and version control through GitHub.**
+$ pip install -r requirements.txt
 
+To run the Streamlit frontend:
+In a terminal, run the Streamlit app with:
 
-</details>
+$ streamlit run deployment/app.py
+This will start the Streamlit web application on your local machine. The Streamlit UI allows you to interact with the intrusion detection system — for example, you could upload or input network flow feature data and get a prediction (Benign or specific attack type) from the model, with some nice visualizations.
 
+To run the FastAPI backend:
+In another terminal, start the FastAPI server with Uvicorn:
 
-## 🔗 Helpful Links
-- [FastAPI Docs](https://fastapi.tiangolo.com/)
-- [Render Deployment Guide](https://render.com/docs/deploy-fastapi)
-- [Streamlit Docs](https://docs.streamlit.io/)
-- [Kaggle Datasets](https://www.kaggle.com/datasets)
-- [Scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)
-- [TensorFlow Tutorials](https://www.tensorflow.org/tutorials)
-- [PyTorch Tutorials](https://pytorch.org/tutorials/)
-
-### Good Look!
+$ uvicorn deployment.api:app --reload
+This launches the FastAPI backend at http://localhost:8000 (default). The --reload flag is useful during development, as it auto-reloads the server on code changes. The FastAPI app provides endpoints for predictions (and could be extended with more functionality). You can visit http://localhost:8000/docs to see the interactive API documentation (powered by Swagger UI) for testing the endpoints. The Streamlit frontend is configured to communicate with this backend to retrieve model predictions. Note: Ensure that both the Streamlit frontend and FastAPI backend are running simultaneously (in separate windows or processes). The Streamlit app will make requests to the FastAPI API to get predictions for input data.
