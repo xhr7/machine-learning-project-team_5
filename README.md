@@ -88,12 +88,6 @@ You can install all the required Python packages with:
 pip install -r requirements.txt
 ```
 
-(Optional but recommended) create and activate a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
 ###  3. Run the Streamlit Frontend
 
