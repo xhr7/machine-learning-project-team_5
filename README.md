@@ -36,23 +36,24 @@ It provides rich network flow records for training and evaluating the IDS.
 ---
 
 ## Project Structure
+## Project Structure
 
 ```plaintext
-├── 01_project.ipynb      # Data cleaning, preprocessing, model training and evaluation
-├── README.md             # Project overview and setup instructions (this file)
+├── 01_project.ipynb        # Data cleaning, preprocessing, model training and evaluation
+├── README.md               # Project overview and setup instructions (this file)
 ├── deployment/
-│   ├── app.py            # Streamlit frontend
-│   └── api.py            # FastAPI backend
-├── models/               # Saved ML models (e.g., model_80.99.h5)
-├── config.toml           # Configuration for Streamlit
+│   ├── app.py              # Streamlit frontend
+│   ├── main.py             # FastAPI backend
+│   └── models/             # Saved ML models (e.g., model_80.99.h5, feature_names.json, etc.)
+├── config.toml             # Configuration for Streamlit
 
-
+```
 
 ----------------------------------
 
 
 
-## Tools & Libraries
+# Tools & Libraries
 
 This project leverages a variety of tools and libraries in the Python ecosystem:
 
@@ -111,7 +112,7 @@ The Streamlit UI allows you to interact with the intrusion detection system — 
 In another terminal window, start the FastAPI server with Uvicorn:
 
 ```bash
-uvicorn deployment.api:app --reload
+uvicorn deployment.main:app --reload
 ```
 
 This launches the **FastAPI backend** at `http://localhost:8000` by default.  
