@@ -42,10 +42,10 @@ It provides rich network flow records for training and evaluating the IDS.
 ├── 01_project.ipynb        # Data cleaning, preprocessing, model training and evaluation
 ├── README.md               # Project overview and setup instructions (this file)
 ├── deployment/
-│   ├── app.py              # Streamlit frontend
-│   ├── main.py             # FastAPI backend
-│   └── models/             # Saved ML models (e.g., model_80.99.h5, feature_names.json, etc.)
-├── config.toml             # Configuration for Streamlit
+│   ├── app.py            # Streamlit frontend
+│   └── api.py            # FastAPI backend
+├── models/               # Saved ML models (e.g., model_80.99.h5)
+├── config.toml           # Configuration for Streamlit
 
 ```
 
@@ -89,12 +89,6 @@ You can install all the required Python packages with:
 pip install -r requirements.txt
 ```
 
-(Optional but recommended) create and activate a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
 ###  3. Run the Streamlit Frontend
 
