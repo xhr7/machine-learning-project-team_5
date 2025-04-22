@@ -3,6 +3,7 @@
 import streamlit as st
 import json
 import requests
+import os
 
 # ─── 1️⃣ Page config ─────────────────────────────────
 st.set_page_config(
@@ -26,7 +27,7 @@ st.markdown("""
     z-index: 0;
   }
 
-  /* central “console” panel */
+  /* central "console" panel */
   .console {
     max-width: 900px;
     margin: 3rem auto;
@@ -115,9 +116,11 @@ if page == "Home":
         else:
             payload = raw
 
+        API_URL = os.getenv("API_URL", "http://localhost:8000/predict")
+
         try:
             res = requests.post(
-                "http://localhost:8000/predict",
+                API_URL,
                 json=payload,
                 timeout=5
             )
